@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+	<head>
+	
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+		<script src="js/highcharts.js"></script>
+		<script src="js/modules/data.js"></script>
+		<script src="js/cmnh_analytics_v2.js"></script>
+	
+		<link rel="stylesheet" type="text/css" href="css/analyticsv2.css"/>
+		<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css"/>	
+	
+	</head>
+	
+	<body>
+	
+		<div id="page1" class="page">
+		
+			<header>
+			
+				<div style="width: 60%; overflow: auto;">
+					<img style="width: 100%; height: auto;" src="images/CMNH_LogoHorizontal.svg" /><br/>
+					<span style="float: left; font-weight: bold;">State of the Web Report</span>
+					<span class="report_date" style="float: right; color: blue; font-weight: bold;"></span>
+				</div>
+			
+			</header>
+
+			<div style="text-align: left;">
+				<span style="font-size: 75%;">
+					<i style="color:blue;" class="fa fa-arrow-up"></i><i style="color:red;" class="fa fa-arrow-down"></i>&nbsp;Indicates change over previous month
+				</span>
+			</div>
+
+		
+			<!-- Primary property overall stats -->
+		
+			<div style="width: 100%; margin-top: 1em;">
+		
+				<div style="float: left; overflow: both; width: 200px;">
+
+					<!-- Visits, Pageviews. Pages per Visit (PPV) -->
+
+					<div style="clear: both; text-align: left;">
+				
+						<span>Visits</span><br/>
+						<div style="float: right; margin-top: 0.25em;">
+							<span id="overview_visits" style="font-size: 150%; font-weight: bold;"></span>
+							<span id="overview_visits_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span>
+						</div>
+				
+					</div>
+					<div style="clear: both; padding-top: 1em; text-align: left;">
+
+						<span>Page Views</span><br/>
+						<div style="float: right; margin-top: 0.25em;">
+							<span id="overview_pageviews" style="font-size: 150%; font-weight: bold;"></span>
+							<span id="overview_pageviews_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span>
+						</div>
+
+					</div>
+					<div style="clear: both; padding-top: 1em; text-align: left;">
+
+						<span>Pages per Visit</span><br/>
+						<div style="float: right; margin-top: 0.25em;">
+							<span id="overview_ppv" style="font-size: 150%; font-weight: bold;"></span>
+							<span id="overview_ppv_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span>
+						</div>
+
+					</div>
+				
+				</div>
+			
+				<!-- Page View charts -->
+			
+				<div style="float: left;">
+					
+					<h2 style="font-size: 100%; text-align: center; margin: 0;">Page Views</h2>
+
+					<div id="hc-11mo_activity" style="float: left; width: 400px; height: 175px; margin: 0 auto"></div>
+					<div id="hc-current_activity" style="float: left; width: 200px; height: 175px; margin: 0 auto"></div>
+
+				</div>
+				
+				<!-- Per-platform Metrics -->
+				
+			</div>
+
+			<div style="clear: both; border-top: solid 1px #CCC; overflow: auto;">
+
+				<h2>Per-Platform Metrics</h2>
+
+				<table style="float: left; text-align: left; width: 475px; border-spacing: 4px;">
+				
+					<tr style="padding: 2px;">
+						
+						<td style="background: none; width: 3%;"></td>
+						
+						<td class="pform_desktop" style="padding: 2px; padding-left: 1em; width: 32%;">Desktop</td>
+
+						<td class="pform_mobile" style="padding: 2px; padding-left: 1em; width: 32%;">Mobile</td>
+
+						<td class="pform_tablet" style="padding: 2px; padding-left: 1em; width: 32%;">Tablet</td>
+
+					</tr>
+
+					<tr>
+					
+						<td style="padding: 2px; width: 100%; border-bottom: solid 2px #000; font-weight: bold;" colspan='4'>Visits</td>
+
+					</tr>
+					
+					<tr style="padding: 2px;">
+						
+						<td style="background: none; width: 3%;"></td>
+						
+						<td class="pform_desktop" style="padding: 2px; width: 32%; text-align: right; padding-right: 1em;"><span id="ppm_visits_desktop_current"></span>&nbsp;<span id="ppm_visits_desktop_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+						<td class="pform_mobile" style="padding: 2px; width: 32%; text-align: right; padding-right: 1em;"><span id="ppm_visits_mobile_current"></span>&nbsp;<span id="ppm_visits_mobile_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+						<td class="pform_tablet" style="padding: 2px; width: 32%; text-align: right; padding-right: 1em;"><span id="ppm_visits_tablet_current"></span>&nbsp;<span id="ppm_visits_tablet_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+					</tr>
+
+					<tr>
+					
+						<td style="padding: 2px; width: 100%; border-bottom: solid 2px #000; font-weight: bold;" colspan='4'>Page Views</td>
+
+					</tr>
+					
+					<tr style="padding: 2px;">
+						
+						<td style="background: none; width: 3%;"></td>
+						
+						<td class="pform_desktop" style="padding: 2px; width: 32%; text-align: right; padding-right: 1em;"><span id="ppm_page_views_desktop_current"></span>&nbsp;<span id="ppm_page_views_desktop_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+						<td class="pform_mobile" style="padding: 2px; width: 32%; text-align: right; padding-right: 1em;"><span id="ppm_page_views_mobile_current"></span>&nbsp;<span id="ppm_page_views_mobile_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+						<td class="pform_tablet" style="padding: 2px; width: 32%; text-align: right; padding-right: 1em;"><span id="ppm_page_views_tablet_current"></span>&nbsp;<span id="ppm_page_views_tablet_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+					</tr>
+
+					<tr>
+					
+						<td style="padding: 2px; width: 100%; border-bottom: solid 2px #000; font-weight: bold;" colspan='4'>Pages per Visit</td>
+
+					</tr>
+					
+					<tr style="padding: 2px;">
+						
+						<td style="background: none; width: 3%;"></td>
+						
+						<td class="pform_desktop" style="padding: 2px; width: 32%; text-align: right; padding-right: 1em;"><span id="ppm_ppv_desktop_current"></span>&nbsp;<span id="ppm_ppv_desktop_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+						<td class="pform_mobile" style="padding: 2px; width: 32%; text-align: right; padding-right: 1em;"><span id="ppm_ppv_mobile_current"></span>&nbsp;<span id="ppm_ppv_mobile_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+						<td class="pform_tablet" style="padding: 2px; width: 32%; text-align: right; padding-right: 1em;"><span id="ppm_ppv_tablet_current"></span>&nbsp;<span id="ppm_ppv_tablet_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+					</tr>
+
+					<tr>
+					
+						<td style="padding: 2px; width: 100%; border-bottom: solid 2px #000; font-weight: bold;" colspan='4'>Avg. Time on Site per Visit</td>
+
+					</tr>
+					
+					<tr style="padding: 2px;">
+						
+						<td style="background: none; width: 3%;"></td>
+						
+						<td class="pform_desktop" style="padding: 2px; width: 32%; text-align: right; padding-right: 1em;"><span id="ppm_avgtime_desktop_current"></span>&nbsp;<span id="ppm_avgtime_desktop_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+						<td class="pform_mobile" style="padding: 2px; width: 32%; text-align: right; padding-right: 1em;"><span id="ppm_avgtime_mobile_current"></span>&nbsp;<span id="ppm_avgtime_mobile_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+						<td class="pform_tablet" style="padding: 2px; width: 32%; text-align: right; padding-right: 1em;"><span id="ppm_avgtime_tablet_current"></span>&nbsp;<span id="ppm_avgtime_tablet_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+					</tr>
+
+					<tr>
+					
+						<td style="padding: 2px; width: 100%; border-bottom: solid 2px #000; font-weight: bold;" colspan='4'>Top Day</td>
+
+					</tr>
+					
+					<tr style="padding: 2px;">
+						
+						<td style="background: none; width: 3%;"></td>
+						
+						<td class="pform_desktop" style="padding: 2px; width: 32%; text-align: left; padding-left: 1em;"><span id="ppm_top_day_desktop_current"></span>&nbsp;<span id="ppm_top_day_desktop_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+						<td class="pform_mobile" style="padding: 2px; width: 32%; text-align: left; padding-left: 1em;"><span id="ppm_top_day_mobile_current"></span>&nbsp;<span id="ppm_top_day_mobile_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+						<td class="pform_tablet" style="padding: 2px; width: 32%; text-align: left; padding-left: 1em;"><span id="ppm_top_day_tablet_current"></span>&nbsp;<span id="ppm_top_day_tablet_change" style="font-size: 50%; white-space: nowrap; text-decoration: underline; vertical-align: top;"></span> </td>
+
+					</tr>
+
+				</table>
+				
+				<div id="hc-platform_metrics" style="float: left; width: 325px; height: 325px; margin: 0 auto"></div>
+
+
+			</div>
+			
+			<h2>Website Assets</h2>
+			
+			<div style="text-align: left; margin-bottom: 1em;">
+			
+				<span style="font-weight: bold; text-align: left;">Top Pages This Month (excluding homepage)</span>
+			
+				<table id="top_pages" style="margin-left: 1em; width: 100%; overflow: hidden;">
+			
+					<tr style="font-size: 50%; text-decoration: underline; ">
+				
+						<td style="width: 10%;">Page Views</td>
+						<td style="width: 10%;">%/total</td>
+						<td style="width: 40%;">URL</td>
+						<td style="width: 40%;">Page Note</td>
+					
+					</tr>
+				
+				</table>
+
+			</div>
+
+			<div style="text-align: left;">
+			
+				<span style="font-weight: bold; text-align: left;">Top Search Terms This Month</span>
+
+				<table id="top_search_terms" style="margin-left: 1em; max-width: 100%; width: 100%; overflow: hidden;">
+				</table>
+
+			</div>
+		
+		</div>
+
+		<footer></footer>
+	
+		<div id="page2" class="page">
+		
+			<header class="post_first_page">
+			
+				<div style="width: 60%; overflow: auto;">
+					<img style="width: 100%; height: auto;" src="images/CMNH_LogoHorizontal.svg" /><br/>
+					<span style="float: left; font-weight: bold;">State of the Web Report</span>
+					<span class="report_date" style="float: right; color: blue; font-weight: bold;"></span>
+				</div>
+			
+			</header>
+
+			<div class="post_first_page" style="text-align: left;">
+				<span style="font-size: 75%;">
+					<i style="color:blue;" class="fa fa-arrow-up"></i><i style="color:red;" class="fa fa-arrow-down"></i>&nbsp;Indicates change over previous month
+				</span>
+			</div>
+
+			<h2>Incoming Traffic</h2>
+			
+			<div style="float: left; width: 400px">
+			
+				<div id="hc-incoming_traffic_profile" style="float: left; width: 400px; height: 350px; margin: 0 auto"></div>
+			
+			</div>
+
+			<div style="float: left; text-align: left; width: 400px;">
+			
+				<span style="font-weight: bold; text-align: left;">Top Referrers (excluding search)</span>
+
+				<table id="top_referrers" style="margin-left: 1em; max-width: 380px; width: 380px; overflow: hidden;">
+				</table>
+
+			</div>
+
+			<div style="clear: both; width: 100%; text-align: left;">
+
+				<span style="font-weight: bold; text-align: left;">Top Campaigns</span>
+
+				<table id="top_campaigns" style="margin-left: 1em; width: 100%; overflow: hidden;">
+			
+					<tr style="font-size: 50%; text-decoration: underline; ">
+				
+						<td style="width: 70%;">Campaign</td>
+						<td style="width: 20%;">Medium</td>
+						<td style="width: 10%;">Visits</td>
+					
+					</tr>
+				
+				</table>				
+
+			</div>
+
+			<!-- Social Media Report -->
+		
+			<h2>Social Media</h2>
+		
+			<div id="social_media_report" style="overflow: auto; width: 100%; clear: both;">
+
+			</div>
+
+	
+		</div>
+		
+
+		<footer></footer>
+		
+		<div id="page3" class="page">
+		
+			<header class="post_first_page">
+			
+				<div style="width: 60%; overflow: auto;">
+					<img style="width: 100%; height: auto;" src="images/CMNH_LogoHorizontal.svg" /><br/>
+					<span style="float: left; font-weight: bold;">State of the Web Report</span>
+					<span class="report_date" style="float: right; color: blue; font-weight: bold;"></span>
+				</div>
+			
+			</header>
+
+			<div class="post_first_page" style="text-align: left;">
+				<span style="font-size: 75%;">
+					<i style="color:blue;" class="fa fa-arrow-up"></i><i style="color:red;" class="fa fa-arrow-down"></i>&nbsp;Indicates change over previous month
+				</span>
+			</div>
+
+			<h2>Secondary Web Properties</h2>
+	
+			<!-- Secondary web properties will be generated and inserted here -->
+
+			<div id="secondary_webp">
+
+			</div>
+	
+		</div>
+	
+	</body>
+	
+</html>

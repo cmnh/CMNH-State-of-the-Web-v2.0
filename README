@@ -1,0 +1,33 @@
+State of the Web v2.0 Report
+
+This is the HTML version of the State of the Web report that is published monthly internally by Carnegie Museum of Natural History.
+The data comes from Google Analytics and HootSuite/Pinterest.
+It uses HTML/Javascript/JQuery for the front end and PHP for the back-end
+It uses Google-hosted JQuery and it requires the following libraries:
+
+Google Analytics Add-on:
+https://github.com/CMP-DigitalEngagement/Google-Analytics-Add-on
+
+Highcharts (including data module):
+http://www.highcharts.com/
+
+Font Awesome (just for the up/down arrows. I know, it seems like overkill. Font Awesome is awesome, though. You should try it.):
+http://fortawesome.github.io/Font-Awesome/
+
+
+
+INSTALLATION:
+
+Follow the instructions to installing the Google Analytics Add-on
+The following files will need to be customized for your particular data feeds (instructions are in each file):
+
+/analytics_json/ga_accounts.php
+/analyitcs_json/sotw_socialmedia_json.php
+/js/sotw_analytics_v2.js
+
+
+
+TO DO:
+
+Currently, it processes the previous month based upon the current month. Most of the logic to process an arbitrary month is in place, it just needs to be all connected with a UI.
+It currently supports 3 secondary web properties. More than 3 secondary web properties won't print properly formatted.

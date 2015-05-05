@@ -1,0 +1,148 @@
+body {
+
+	font-family: Verdana;
+	font-size: 100%;
+	background: #BBB;
+	text-align: center;
+	margin: 0 0;
+}
+
+.page {
+
+	width: 800px;
+	background: white;
+	margin: 0 auto;
+	overflow: auto;
+	padding: 1em 5em;
+
+}
+
+header {
+
+	padding: 0.25em 0;
+	border-bottom: solid 1px #CCC;
+	
+}
+
+.pform_desktop {
+
+	background: #ddebf6;
+
+}
+.pform_mobile {
+
+	background: #fbe4d7;
+
+}
+.pform_tablet {
+
+	background: #e2efdb;
+
+}
+
+.post_first_page {
+
+	display: none;
+	
+}
+
+
+#sm_table {
+
+	width: 100%;
+
+}
+
+.sm_header {
+
+	text-align: center;
+	padding: 0 15px;
+
+}
+
+.sm_header img {
+
+	width: 50px;
+	height: auto;
+	display: block;
+	margin: 0 auto;
+
+}
+
+.sm_header img::after {
+
+	content: '';
+	display: block;
+	clear: both;
+
+}
+
+.sm_metrics {
+
+	text-align: left;
+	text-decoration: underline;
+	font-size: 50%;
+
+}
+
+.sm_accounts {
+
+	text-align: left;
+	padding-right: 20px;
+	white-space: nobreak;
+	width: 0px;
+
+}
+
+.sm_metrics_data {
+
+	text-align: right;
+	padding-left: 5px;
+
+}
+
+.sm_metrics_data_change {
+
+	text-align: left;
+	padding-right: 5px;
+
+}
+
+.sm_metrics_totals {
+
+	font-weight: bold;
+
+}
+
+.sm_metrics_metric_total {
+
+	text-align: right;
+	padding-left: 5px;	
+
+}
+
+.sm_metrics_metric_change_total {
+
+	text-align: left;
+	padding-right: 5px;
+
+
+}
+
+
+@media print {
+    footer {page-break-after: always;}
+	
+	body {
+	
+		background: #FFF;
+		
+	}
+	
+	.post_first_page {
+
+		display: block;
+	
+	}
+
+}

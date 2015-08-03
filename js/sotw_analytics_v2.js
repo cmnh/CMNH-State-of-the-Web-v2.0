@@ -483,10 +483,18 @@ $(document).ready(function() {
 				//
 				// Platform breakdown
 
+				var desktop_curr_visits=0;
+				var mobile_curr_visits=0;
+				var tablet_curr_visits=0;
+
+				if (sp_data.overview.hasOwnProperty('desktop')) {desktop_curr_visits=sp_data.overview.desktop.visits.current;}
+				if (sp_data.overview.hasOwnProperty('mobile')) {mobile_curr_visits=sp_data.overview.mobile.visits.current;}
+				if (sp_data.overview.hasOwnProperty('tablet')) {tablet_curr_visits=sp_data.overview.tablet.visits.current;}
+
 				var ppm_chart_data=[
-					{name: 'Desktop', y: sp_data.overview.desktop.visits.current, color: '#6faddb' },
-					{name: 'Mobile',  y: sp_data.overview.mobile.visits.current,  color: '#f09048' },
-					{name: 'Tablet',  y: sp_data.overview.tablet.visits.current,  color: '#679149' } 
+					{name: 'Desktop', y: desktop_curr_visits, color: '#6faddb' },
+					{name: 'Mobile',  y: mobile_curr_visits,  color: '#f09048' },
+					{name: 'Tablet',  y: tablet_curr_visits,  color: '#679149' } 
 				];
 
 				$("#"+index_name+"_swp_hc-platform_metrics").highcharts({

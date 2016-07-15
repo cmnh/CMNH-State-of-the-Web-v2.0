@@ -1,11 +1,12 @@
 <?php
 
 	//
-	// This grabs social media information from the services that CMNH uses, HootSuite and Pinterest
-	// It has been specifically tailored for CMNH and will *probably* work for other HootSuite & Pinterest accounts with slight modificaions
+	// This grabs social media information from the services that CMNH uses, HootSuite, Pinterest and Tumblr
+	// It has been specifically tailored for CMNH and will *probably* work for other HootSuite & Pinterest accounts with slight modifications
 	// It only supports the Twitter Profile Overview and Facebook Page Overview reports and the Pinterest Re-pin report
 	// NOTE:: Neither services has an API for analytics data, so this is essentially screen scraping and will most likely fail at the whims of HootSuite & Pinterest
- 
+	//
+	// Tumblr uses OAUTH2 authentication and requires the user to generate a consumer key via their website 
  	//
  	// The sotw_analytics_v2.js is looking for JSON-data formatted thusly:
 	// (Note: the report can support multiple metrics per platform, CMNH just does not currently collect any.) 
@@ -88,13 +89,10 @@
 	}
  	
  	*/
+
   
 	error_reporting(E_ALL & E_NOTICE);
-
-	// Running the server on a different domain or from your local machine?
-	// You will need to uncomment or adjust this 
-	//
-	//header('Access-Control-Allow-Origin: *'); 
+	header('Access-Control-Allow-Origin: *'); 
 	
 	$month=$_GET['month'];
 	$year=$_GET['year'];
@@ -111,32 +109,29 @@
 	  
 	}
 	
-	//
-	// These are the CMNH accounts. Adjust accordingly. report_id can be found in the URL when the desired analytics report is selected at HootSuite
-	
-	$socialmedia_accounts='[ 
+	$hootsuite_accounts='[ 
 		{ "title": "CarnegieMNH",
 		  "type": "Facebook",
-		  "report_id": 1909855 },
+		  "report_id": 3525432 },
 		{ "title": "Dippy the Dino",
 		  "type": "Facebook",
-		  "report_id": 1909874 },
-		{ "title": "Powdermill Nature Reserve",
+		  "report_id": 3525433 },
+		{ "title": "PNR",
 		  "type": "Facebook",
-		  "report_id": 1909877 },
-		{ "title": "Dippy the Dino",
-		  "type": "Twitter",
-		  "report_id": 1909882 },
+		  "report_id": 3525435 },
 		{ "title": "CarnegieMNH",
 		  "type": "Twitter",
-		  "report_id": 1909878 },
+		  "report_id": 3525429 },
 		{ "title": "CarnegieMNH",
 		  "type": "Pinterest",
 		  "domain": "carnegiemnh.org"
+		},
+		{ "title": "CarnegieMNH",
+		  "type": "Tumblr"
 		}
 	]';
 	
-	$hs_accounts=json_decode($socialmedia_accounts);
+	$hs_accounts=json_decode($hootsuite_accounts);
 	
 	$startdate=date("Y-m-d", strtotime($year."-".$month."-01"));
 	$enddate=date("Y-m-t", strtotime($startdate));
@@ -146,16 +141,18 @@
 	$hs_date1=date("M t, Y", strtotime($p_startdate));
 	$hs_date2=date("M d, Y", strtotime($enddate));
 	
-	//
-	// Supply URI-encoded credentials
-	
 	$hs=new HootSuite(' --username-- ',' --password-- ');
 	$pin=new Pinterest(' --username-- ',' --password-- ');
 	
+	#
+	# Now with Tumblr support (yay.)
+	
+	$tum=new Tumblr(' -- tumblr url -- ',' -- consumer key -- ');
+
 	$social_media="";
 	$social_media['accounts']=Array();
 	$a=Array();
-	
+
 	foreach ($hs_accounts as $ac) {
 	
 		if ($ac->type=='Twitter') {
@@ -224,8 +221,14 @@
 
 			}
 
+		} else if ($ac->type=='Tumblr') {
+			
+			$results=$tum->GetReport($startdate, $enddate);
+
+			$this_month=$results['last_month']+$results['this_month'];
+			$last_month=$results['last_month'];
+	
 		}
-		
 		
 		$m="";
 		$p="";
@@ -236,6 +239,8 @@
 			$m['metric']='Followers';
 		} else if ($ac->type=='Pinterest') {
 			$m['metric']='Repins';
+		} else if ($ac->type=='Tumblr') {
+			$m['metric']='Notes';
 		}
 
 		$m['value']=intval($this_month);
@@ -269,43 +274,180 @@ class HootSuite {
 	
 	public function HootSuite($username, $password) {
 
-		$loginUrl = 'https://hootsuite.com/login';
-	
-		$header = array(
-			'Origin: https://hootsuite.com',
-			'Accept-Encoding: gzip, deflate',
-			'Accept-Language: en-US,en;q=0.8',
-			'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36',
-			'Content-Type: application/x-www-form-urlencoded',
+		$header_out = array(
 			'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+			'Accept-Language: en-US,en;q=0.8',
 			'Cache-Control: max-age=0',
-			'Referer: https://hootsuite.com/login',
-			'Connection: keep-alive'
+			'Connection: keep-alive',
+			'Referer: https://hootsuite.com',
+			'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36'
 			);
-	
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $loginUrl);
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 1);
-		curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, 'email='.$username.'&password='.$password.'&googleAuthenticator=&method=email');
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+		$loginUrl = 'https://hootsuite.com/login';
 		
 		//
-		// Retrieve authentication cookies
-	
+		// Login redirect to capture csrfToken (not needed?)
+		
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $loginUrl);
+		curl_setopt($ch, CURLOPT_POST, 0);
+		curl_setopt($ch, CURLOPT_HEADER, 1);
+		curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header_out);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, 0);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_COOKIEFILE, "");    // OMG. You need this when curl does redirects to capture cookies correctly.
+		
 		$data        = curl_exec($ch);
 		$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 		$header      = substr($data, 0, $header_size);
-	
+
 		preg_match_all("/^Set-Cookie: (.*?);/ism", $header, $cookies);
 		foreach( $cookies[1] as $cookie ){
 			$buffer_explode = strpos($cookie, "=");
 			$this->cookies[ substr($cookie,0,$buffer_explode) ] = substr($cookie,$buffer_explode+1);
 		}
+
+		preg_match("/^.*?csrfToken = '(.*?)';/m", $data, $csrf_token);
+		preg_match("/Location: (\/login?.*)\r/i", $header, $where);
+
+		$information = curl_getinfo($ch);
+
+		curl_close($ch);
+
+		//
+		// Login and verify credentials
+
+		$post_data=array('email'=>$username,
+						 'password'=>$password,
+						 'googleAuthenticator'=>'',
+						 'method'=>'email',
+						 'csrfToken'=>$csrf_token[1]);
+
+		$referer="https://hootsuite.com".$where[1];
+
+		$header_out = array(
+			'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+			'Accept-Encoding: gzip, deflate',
+			'Accept-Language: en-US,en;q=0.8',
+			'Cache-Control: max-age=0',
+			'Connection: keep-alive',
+			'Content-Type: application/x-www-form-urlencoded',
+			'Host: hootsuite.com',
+			'Origin: https://hootsuite.com',
+			'Referer: '.$referer,
+			'Upgrade-Insecure-Requests: 1',
+			'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36'
+			);
+
+		$ch= curl_init();
+		curl_setopt($ch, CURLOPT_URL, "https://hootsuite.com/login");
+		curl_setopt($ch, CURLOPT_HEADER, 1);
+		curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header_out);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_data));
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+		$cookieBuffer = array();
+		foreach(  $this->cookies as $k=>$c ) $cookieBuffer[] = "$k=$c";
+		curl_setopt($ch, CURLOPT_COOKIE, implode("; ",$cookieBuffer) );
 		
+		$data        = curl_exec($ch);
+		$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+		$header="";
+		$header      = substr($data, 0, $header_size);
+
+		preg_match_all("/^Set-Cookie: (.*?);/ism", $header, $cookies);
+		foreach( $cookies[1] as $cookie ){
+			$buffer_explode = strpos($cookie, "=");
+			$this->cookies[ substr($cookie,0,$buffer_explode) ] = substr($cookie,$buffer_explode+1);
+		}
+
+		$information = curl_getinfo($ch);
+		curl_close($ch);
+		preg_match("/Location: (.*)\r/i", $header, $ww);
+		$where="https://hootsuite.com".$ww[1];
+
+		//
+		// authorize for oauth2
+		
+		$header_out = array(
+			'Accept-Encoding: gzip, deflate, sdch',
+			'Accept-Language: en-US,en;q=0.8',
+			'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36',
+			'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+			'Cache-Control: max-age=0',
+			'Connection: keep-alive',
+			'Upgrade-Insecure-Requests: 1',
+			'Host: hootsuite.com',
+			'Referer: '.$referer
+			);
+
+		$ch= curl_init();
+		curl_setopt($ch, CURLOPT_URL, $where);
+		curl_setopt($ch, CURLOPT_HEADER, 1);
+		curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
+		curl_setopt($ch, CURLOPT_HTTPGET, 1);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header_out);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+		$cookieBuffer = array();
+		foreach(  $this->cookies as $k=>$c ) $cookieBuffer[] = "$k=$c";
+		curl_setopt($ch, CURLOPT_COOKIE, implode("; ",$cookieBuffer) );
+		
+		$data        = curl_exec($ch);
+		$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+		$header="";
+		$header      = substr($data, 0, $header_size);
+
+		$information = curl_getinfo($ch);
+		curl_close($ch);
+
+		preg_match("/Location: (.*)\r/i", $header, $ww);
+		$where=$ww[1];
+
+		//
+		// Final step in oauth2
+
+		$header_out = array(
+			'Accept-Encoding: gzip, deflate, sdch',
+			'Accept-Language: en-US,en;q=0.8',
+			'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36',
+			'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+			'Cache-Control: max-age=0',
+			'Connection: keep-alive',
+		);
+
+		$ch= curl_init();
+		curl_setopt($ch, CURLOPT_URL, $where);
+		curl_setopt($ch, CURLOPT_HEADER, 1);
+		curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
+		curl_setopt($ch, CURLOPT_HTTPGET, 1);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header_out);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+		$cookieBuffer = array();
+		foreach(  $this->cookies as $k=>$c ) $cookieBuffer[] = "$k=$c";
+		curl_setopt($ch, CURLOPT_COOKIE, implode("; ",$cookieBuffer) );
+		
+		$data        = curl_exec($ch);
+		$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+		$header="";
+		$header      = substr($data, 0, $header_size);
+
+		preg_match_all("/^Set-Cookie: (.*?);/ism", $header, $cookies);
+		foreach( $cookies[1] as $cookie ){
+			$buffer_explode = strpos($cookie, "=");
+			$this->cookies[ substr($cookie,0,$buffer_explode) ] = substr($cookie,$buffer_explode+1);
+		}
+
+		$information = curl_getinfo($ch);
+
 	}
 	
 	public function GetReport($report_id, $startdate, $enddate) {	
@@ -326,9 +468,8 @@ class HootSuite {
 		
 			curl_setopt($ch, CURLOPT_URL, 'https://hootsuite.com/analytics/view?reportId='.$report_id.'&displayType=CSV&dateRange='.$startdate.'%20-%20'.$enddate);
 			$content = curl_exec($ch);
-			
 			curl_close($ch);
-		
+
 			return parse_csv( $content );
 			
 		}
@@ -346,11 +487,6 @@ class Pinterest {
 
 		$loginUrl = 'https://www.pinterest.com/resource/UserSessionResource/create/';
 	
-		//
-		// I am sure these headers need to be constructed with more care
-		// But OMG it was easier to just copy the headers from a working transaction
-		// They may not work for you (pay attention to the CSRTokens)
-	
 		$header = array(
 			'Origin: https://www.pinterest.com',
 			'Accept-Encoding: gzip, deflate',
@@ -359,7 +495,6 @@ class Pinterest {
 			'X-NEW-APP: 1',
 			'X-APP-VERSION: cc98082',
 			'X-CSRFToken: 6m5X9Bq08FJPzuDsQVHEYZ535jrobzjP',
-			'Cookie: _pinterest_pfob=disabled; _b="AQYwV7hlDSFFyLMPdUhyEN2CYbgEZy7K+gZFGKeiv1+gr+IR7Fx/rIfBVYi5ka6jRHM="; _pinterest_cm=disabled; _pinterest_referrer="https://www.google.com/"; __utmt=1; csrftoken=6m5X9Bq08FJPzuDsQVHEYZ535jrobzjP; logged_out=True; fba=True; _pinterest_sess=TWc9PSZMdTB3Uzl1SW9pamxCTGtienRIclBVbEpMZDhVZ1k3aGZ4Q0ZSSnZNZWFPa0c1WjJZRWFTdDhkM0VSbm9UV3NPUUY0QnhsTWRGdEpLNGJ1VHFrZVcyVlFNSWVFM3NibHJONFp6WXR4QzVTMklPV3BEaXNVOTZHZldpemNPY1JTeWNFdER2dzMwcFhpc3ducmgrcUhOa0E9PSZJdFlVeGhvRy9mU3FERmJLc2ZWT0NrSmhMUkk9; c_dpr=1; __utma=229774877.899339231.1401714023.1430512681.1430833335.27; __utmb=229774877.7.9.1430833344507; __utmc=229774877; __utmz=229774877.1430833335.27.15.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); GCSCE_5B243246522C4B23F685F2EB9D5F3C78DF8A0272_S3=C=694505692171-31closf3bcmlt59aeulg2j81ej68j6hk.apps.googleusercontent.com:S=4adb5b3e2d7a9d76a389f4f5b105b96534ff6dd1.dZU3N5SjTIz1Z3w3.1893:I=1430833375:X=1430919775',
 			'X-Pinterest-AppState: active', 			
 			'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36',
 			'Content-Type:  application/x-www-form-urlencoded; charset=UTF-8',
@@ -392,6 +527,7 @@ class Pinterest {
 			$this->cookies[ substr($cookie,0,$buffer_explode) ] = substr($cookie,$buffer_explode+1);
 		}
 		
+		//print json_encode($this->cookies);
 	}
 	
 	public function GetReport($domain, $startdate, $enddate) {	
@@ -405,20 +541,12 @@ class Pinterest {
 			curl_setopt($ch, CURLOPT_HEADER, 0);
 			curl_setopt($ch, CURLINFO_HEADER_OUT, 0);
 			curl_setopt($ch, CURLOPT_POST, 0);
-			//curl_setopt($ch, CURLOPT_HTTPGET, true);
-			//curl_setopt($ch, CURLOPT_ENCODING , "");
 			
 			$cookieBuffer = array();
 			foreach(  $this->cookies as $k=>$c ) $cookieBuffer[] = "$k=$c";
 			curl_setopt($ch, CURLOPT_COOKIE, implode("; ",$cookieBuffer) );
-
-			//
-			// There is no way to get current a current repin value, so I slurp what I assume is repins from when the account was created? Maybe you need to adjust the start_date?
-		
-			curl_setopt($ch, CURLOPT_URL, 'https://analytics.pinterest.com/analytics/domain/'.$domain.'/export/?application=all&tab=repins&end_date='.$enddate.'&start_date=2012-11-01');
-			
+			curl_setopt($ch, CURLOPT_URL, 'https://analytics.pinterest.com/analytics/domain/carnegiemnh.org/export/?application=all&tab=repins&end_date='.$enddate.'&start_date=2012-11-01');
 			$content = curl_exec($ch);
-
 			curl_close($ch);
 		
 			return parse_csv( $content );
@@ -427,6 +555,109 @@ class Pinterest {
 			
 	}
 
+}
+
+Class Tumblr {
+
+	private $blog;
+	private $ckey;
+	
+	public function Tumblr($blog_name, $consumer_key) {
+
+		$this->blog=$blog_name;
+		$this->ckey=$consumer_key;
+
+	}
+	
+	public function GetReport($startdate, $enddate) {
+		
+		$startdate_epoch=DateTime::createFromFormat('Y-m-d H:i:s', $startdate." 00:00:00")->getTimeStamp();
+		$enddate_epoch=DateTime::createFromFormat('Y-m-d H:i:s', $enddate." 23:59:59")->getTimeStamp();
+
+		$offset=0;
+		$limit=20;
+		$overflow=1000;
+		$last_timestamp=0;
+		$total_posts=0;
+		$post_count=0;
+		$notecount=0;
+		$notecount_m=0;
+		
+		while ($overflow>0) {
+			
+			$overflow-=1;
+			
+			$ch = curl_init();
+
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_setopt($ch, CURLINFO_HEADER_OUT, 0);
+			curl_setopt($ch, CURLOPT_POST, 0);
+			curl_setopt($ch, CURLOPT_URL, 'http://api.tumblr.com/v2/blog/'.$this->blog.'/posts?api_key='.$this->ckey.'&notes_info=true&offset='.$offset.'&limit='.$limit);
+			
+			$content = curl_exec($ch);
+
+			curl_close($ch);
+
+			$j=json_decode($content);
+			$total_posts=$j->{'response'}->{'total_posts'};
+			
+			foreach ($j->{'response'}->{'posts'} as $p=>$v) {
+				
+				$post_count++;
+			
+				$ts=$j->{'response'}->{'posts'}[$p]->{'timestamp'};	
+
+				$last_timestamp=$ts;
+				
+				if ($ts<=$enddate_epoch && $ts>=$startdate_epoch) {
+										
+					foreach ($ts=$j->{'response'}->{'posts'}[$p]->{'notes'} as $q=>$r) {
+					
+						if ($j->{'response'}->{'posts'}[$p]->{'notes'}[$q]->{'type'} != 'posted') {
+							
+							$notecount_m++;
+							
+						}
+						
+					}
+					
+				} else if ($ts<$startdate_epoch) {
+					
+					foreach ($ts=$j->{'response'}->{'posts'}[$p]->{'notes'} as $q=>$r) {
+					
+						if ($j->{'response'}->{'posts'}[$p]->{'notes'}[$q]->{'type'} != 'posted') {
+							
+							$notecount++;
+							
+						}
+				
+					}
+					
+				}
+				
+			}
+			
+			if ($post_count>=$total_posts) {
+			
+				break;
+				
+			}
+		
+			$offset+=$limit;
+		
+		}
+		
+		$res=array();
+		
+		$res['this_month']=$notecount_m;
+		$res['last_month']=$notecount;
+
+		return $res;
+	
+	}
+	
 }
 
 

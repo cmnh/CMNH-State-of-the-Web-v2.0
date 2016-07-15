@@ -15,7 +15,7 @@ var secondary_properties=[ {title: '',url: '', index: ''} ];
 
 //
 // HTML for secondary web properties
-var swp_html="<div style=\"clear: both; width: 100%; padding-left: 1em; text-align: left;\"><span id=\"##INDEX##_swp_title\" style=\"font-weight: bold; text-align: left;\"></span><br/><div style=\"clear: both; float: left; width: 35%;\"><table style=\"width: 100%;\"><tr><td style=\"width: 50%;\">Visits</td><td id=\"##INDEX##_swp_visits\" style=\"width: 50%; text-align: right; font-weight: bold;\"></td></tr><tr><td style=\"width: 50%;\">Page Views</td><td id=\"##INDEX##_swp_pv\" style=\"width: 50%; text-align: right; font-weight: bold;\"></td></tr><tr><td style=\"width: 50%;\">Avg. Time</td><td id=\"##INDEX##_swp_avgtime\" style=\"width: 50%; text-align: right; font-weight: bold;\"></td></tr></table><div id=\"##INDEX##_swp_hc-platform_metrics\" style=\"float: left; width: 300px; height: 250px; margin: 0 auto\"></div></div><div style=\"float: left; width: 65%;\"><table id=\"##INDEX##_swp_referrers\" style=\"margin-left: 1em; width: 100%; overflow: hidden;\"><tr style=\"font-size: 50%; text-decoration: underline; \"><td colspan=\"2\" style=\"width: 70%;\">Top Referrers</td></tr></table><div id=\"##INDEX##_swp_hc-current_activity\" style=\"float: left; width: 100%; height: 175px; margin: 0 auto\"></div></div><div>";
+var swp_html="<div style=\"clear: both; width: 100%; padding-left: 1em; text-align: left; position: relative; page-break-inside: avoid;\"><span id=\"##INDEX##_swp_title\" style=\"font-weight: bold; text-align: left;\"></span><br/><div style=\"clear: both; float: left; width: 35%;\"><table style=\"width: 100%;\"><tr><td style=\"width: 50%;\">Visits</td><td id=\"##INDEX##_swp_visits\" style=\"width: 50%; text-align: right; font-weight: bold;\"></td></tr><tr><td style=\"width: 50%;\">Page Views</td><td id=\"##INDEX##_swp_pv\" style=\"width: 50%; text-align: right; font-weight: bold;\"></td></tr><tr><td style=\"width: 50%;\">Avg. Time</td><td id=\"##INDEX##_swp_avgtime\" style=\"width: 50%; text-align: right; font-weight: bold;\"></td></tr></table><div id=\"##INDEX##_swp_hc-platform_metrics\" style=\"float: left; width: 300px; height: 250px; margin: 0 auto\"></div></div><div style=\"float: left; width: 65%;\"><table id=\"##INDEX##_swp_referrers\" style=\"margin-left: 1em; width: 100%; overflow: hidden;\"><tr style=\"font-size: 50%; text-decoration: underline; \"><td colspan=\"2\" style=\"width: 70%;\">Top Referrers</td></tr></table><div id=\"##INDEX##_swp_hc-current_activity\" style=\"float: left; width: 100%; height: 175px; margin: 0 auto\"></div></div><div>";
 
 $(document).ready(function() {
 
@@ -193,6 +193,7 @@ $(document).ready(function() {
  	            	connectorWidth: 0,
  	            	distance: -50,
  	            	formatter: function() {
+                        //return "<span style=\"color: "+this.point.color+";\">"+this.key+"</span><br/><span style=\"color: "+this.point.color+";\">"+(this.percentage/100).toLocaleString('en-US', {style: 'percent', maximumFractionDigits: '0'})+"</span>" ;
                         return "<span style=\"color: #000\">"+this.key+"</span><br/><span style=\"color: #000\">"+(this.percentage/100).toLocaleString('en-US', {style: 'percent', maximumFractionDigits: '0'})+"</span>" ;
                     }
  	            },
@@ -213,11 +214,10 @@ $(document).ready(function() {
 			if (data.top_pages[i][0]!="/") {
 			
 				var title=data.top_pages[i][1];
-
-				//
-				// If you want to massage the titles names, this is the place to do it
+				title=title.replace(" : ","");
+				title=title.replace("Carnegie Museum of Natural History","");
 			
-				var html="<tr style=\"background-color: "+top_pages_bg_colors[top_pages_color_alternate]+"\"><td style=\"text-align: right;\">"+data.top_pages[i][2]+"</td><td style=\"text-align: right;\">"+(data.top_pages[i][2]/data.overview.totals.visits.current).toLocaleString('en-US',{style: 'percent', maximumFractionDigits: '1'})+"</td><td>"+data.top_pages[i][0]+"</td><td>"+title+"</td></tr>";
+				var html="<tr style=\"background-color: "+top_pages_bg_colors[top_pages_color_alternate]+"\"><td style=\"text-align: right;\">"+data.top_pages[i][2]+"</td><td style=\"text-align: right;\">"+(data.top_pages[i][2]/data.overview.totals.visits.current).toLocaleString('en-US',{style: 'percent', maximumFractionDigits: '1'})+"</td><td>"+data.top_pages[i][0]+"</td><td><div style=\"display: block; max-height: 1.35em; overflow: hidden;\">"+title+"</div></td></tr>";
 
 				$("#top_pages").append(html);
 
@@ -240,7 +240,7 @@ $(document).ready(function() {
 		var top_st_color_alternate=0;
 		for (var i=0;i<12; i+=2) {	
 						
-			var html="<tr style=\"background-color: "+top_pages_bg_colors[top_pages_color_alternate]+"\"><td style=\"overflow: hidden; width: 50%; max-width: 390px;\">"+top_terms[i].term+"</td><td style=\"overflow: hidden; width: 50%; max-width: 390px;\">"+top_terms[i+1].term+"</td></tr>";
+			var html="<tr style=\"background-color: "+top_pages_bg_colors[top_pages_color_alternate]+"\"><td style=\"overflow: hidden; width: 50%; max-width: 390px;\"><div style=\"display: block; max-height: 2.5em; overflow: hidden;\">"+top_terms[i].term+"</div></td><td style=\"overflow: hidden; width: 50%; max-width: 390px;\"><div style=\"display: block; max-height: 2.5em; overflow: hidden;\">"+top_terms[i+1].term+"</div></td></tr>";
 			$("#top_search_terms").append(html);
 			top_pages_color_alternate=Math.abs(top_pages_color_alternate-1);
 					
@@ -320,8 +320,10 @@ $(document).ready(function() {
 	//
 	// Process social media
 	
-	$.getJSON( "analytics_json/sotw_socialmedia_json.php", function( data ) {
+	$.getJSON( "analytics_json/socialmedia.php", function( data ) {
 	
+		console.log(data);
+
 		//
 		// Build list of platforms/metrics
 
@@ -368,7 +370,7 @@ $(document).ready(function() {
 		for (var p in platforms) {
 		
 			var colspan="colspan=\""+(platforms[p].metrics.length*2)+"\"";
-			$(sm_table).find("#sm_table_header").append("<td "+colspan+" class	=\"sm_header\"><img src=\"images/"+p+".jpg\">"+p+"</td>");
+			$(sm_table).find("#sm_table_header").append("<td "+colspan+" class	=\"sm_header\"><img src=\"images/ns_"+p+".png\">"+p+"</td>");
 
 			for (var m in platforms[p].metrics) {
 				$(sm_table).find("#sm_table_metrics").append("<td colspan=\"2\" class=\"sm_metrics\">"+platforms[p].metrics[m]+"</td>");
@@ -460,12 +462,15 @@ $(document).ready(function() {
 
 	//
 	// Process secondary properties
-	//
-				  
+	
+	var secondary_page=1;
+	var secondary_ppp=3; // properties per page
+	var sppp_count=0;
+	
 	for (var sp in secondary_properties) {
 
 		var twp=swp_html.replace(/##INDEX##/g, secondary_properties[sp].index);
-		$("#secondary_webp").append(twp);
+		$("#secondary_webp_"+secondary_page).append(twp);
 
 		$.getJSON( "analytics_json/sotw_analytics_json.php?property="+secondary_properties[sp].index, (function( index_name, title, url ) {
 
@@ -525,7 +530,6 @@ $(document).ready(function() {
 							connectorWidth: 0,
 							distance: -50,
 							formatter: function() {
-								//return "<span style=\"color: "+this.point.color+";\">"+this.key+"</span><br/><span style=\"color: "+this.point.color+";\">"+(this.percentage/100).toLocaleString('en-US', {style: 'percent', maximumFractionDigits: '0'})+"</span>" ;
 								return "<span style=\"color: #000\">"+this.key+"</span><br/><span style=\"color: #000\">"+(this.percentage/100).toLocaleString('en-US', {style: 'percent', maximumFractionDigits: '0'})+"</span>" ;
 							}
 						},
@@ -595,6 +599,12 @@ $(document).ready(function() {
 			};
 			
 		})(secondary_properties[sp].index, secondary_properties[sp].title, secondary_properties[sp].url));
+		
+		sppp_count++;
+		if (sppp_count==secondary_ppp) {
+			sppp_count=0;
+			secondary_page++;
+		}
 		
 	}
 		

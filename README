@@ -31,3 +31,8 @@ TO DO:
 
 Currently, it processes the previous month based upon the current month. Most of the logic to process an arbitrary month is in place, it just needs to be all connected with a UI.
 It currently supports 3 secondary web properties. More than 3 secondary web properties won't print properly formatted.
+
+
+Version 2.2
+
+Added support for Tumblr, new icons
